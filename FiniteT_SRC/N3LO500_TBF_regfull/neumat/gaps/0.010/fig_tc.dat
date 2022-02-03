@@ -1,0 +1,117 @@
+# PREPARE OUTPUT
+set encoding utf8
+#set terminal postscript color enhanced font "Times,16" size 5.5,4.5 portrait; set output 'MR_SLy_SCGF.eps';
+set terminal pdfcairo color enhanced font "Palatino,30" size 5,5;
+set output 'mdot.pdf';
+
+DX=0.19; DY=0.16;
+SDX=0.03; SDY=0.03;
+SX=0.76; SY=0.76;
+
+folder="."
+
+# x range the same for all
+xlab="Temperature, T [MeV]"; 
+
+# y range and label for UL
+#ylab1="GR correction to accretion rate at infinity, ~M{1.1.}_{ ∞}";
+ylab1="GR correction to accretion rate, {/Symbol x}";
+
+forces="POL/SLy POL/APR4 POL/H4 POL/MPA1";
+forcename="SLy APR4 H4 MPA1"
+Nforces=words(forces)
+
+xmin=0.0; xmin1=0.0; 
+xmax=0.5; xmax1=0.5; ddx1=0.1;
+
+ymin=0.7; ymin1=0.7;
+ymax=1; ymax1=1; ddy1=0.05; 
+ 
+
+#set xlabel font "Times,16" 
+#set ylabel font "Times,16" 
+
+# Grid
+#set style line 12 lc rgb'#808080' lt 0 lw 1
+#set grid back ls 12
+
+G=6.67408e-11
+c=299792458
+Ms=1.98855e30
+R0=G*Ms/1e3/c**2
+
+load 'div4.plt'
+# line styles
+
+set style line 21 lc rgb '#d7191c' dt 1 lw 2.5
+set style line 22 lc rgb '#0000FF' dt 2 lw 2.5
+set style line 23 lc rgb '#7000a0' dt 2 lw 2.5
+
+
+# EOS BOUNDS
+	set style line 12 lc rgb "#FB9A29" lw 1.5 lt 3 
+	set style line 13 lc rgb "#CC4C02" lw 1.5 lt 3 
+	set style line 14 lc rgb "#662506" lw 1.5 lt 3 
+
+	set style line 15 lc rgb "#7FB972" lw 2 lt 1 # Green
+	set style line 16 lc rgb "#424242" lw 2 lt 1 # Grey
+	
+	set style line 17 lc rgb "#C8C8C8"
+	set style line 18 lc rgb "#88CCEE" lw 2.5 lt 2
+	set style line 19 lc rgb "#DC050C" lw 2.5 lt 1
+
+    	set style fill transparent pattern 5  
+	
+###########################################################
+	set border lw 2
+
+###########################################################
+# FIRST GRAPH - UL
+  	set bmargin at screen DY;
+	set tmargin at screen DY+SY;
+	set lmargin at screen DX;
+	set rmargin at screen DX+SX;
+
+	set xrange [xmin:xmax]; set yrange [ymin:ymax]  
+
+  	set xtics border xmin1, ddx1, xmax1 offset 0,0.5; set mxtics 4;
+	set xlabel xlab offset 0,1
+
+  	set ytics border ymin1, ddy1, ymax1; set mytics 5;
+	set ylabel ylab1 offset 2,0 
+	
+	set key reverse samplen 3 width -1 Left maxrows 11 nobox
+	set key at graph 0.4,0.52 height 0.25 font ",25"
+
+	set border front
+	set tics front
+
+	do for [ii1=1:words(forces)]{ print word(forces,ii1)} 
+
+	set style fill transparent solid 0.06 noborder
+	set style circle radius 0.1 
+
+	file="efficiency.dat"
+	file0="efficiency0.dat"
+
+	facBH=1./2.;
+	facPinf=4./9.;
+	facCaus=1/2.9;
+	
+	print facPinf,facCaus
+
+	set label 1 "BH" at 5.4,1.95 rotate by 60 textcolor rgb "#FFFFFF" front
+	set label 2 "P < {/Symbol \245}" at facPinf+0.02,0.88 rotate by -90 textcolor rgb "#FFFFFF" front
+	set label 3 "Causality" at facCaus+0.03,0.9 rotate by -90 textcolor rgb "#FFFFFF" front
+
+	plot file0 u 1:( $1 < facCaus ? 1/0 : 2) w filledcurves x1 fs transparent solid 1 noborder lt 12 notitle,\
+	file0 u 1:( $1 < facPinf ? 1/0 : 2) w filledcurves x1 fs transparent solid 1 noborder lt 13 notitle,\
+	file u 1:5 i 0 w l lt 21 title "C(1+z)/z", \
+	file u 1:(1-$1/2) i 0 w l lt 22 title "1-C/2", \
+	for [ii1=1:Nforces] folder.word(forces,ii1)."/MR_1.40Ms.dat" u (R0*$5/$4):(R0*$5/$4*(1+$8)/$8) i 0 w p lt ii1 pt 2+ii1*2 notitle, \
+	for [ii1=1:Nforces] folder.word(forces,ii1)."/MR_Maximum.dat" u (R0*$5/$4):(R0*$5/$4*(1+$8)/$8) i 0 w p lt ii1 title word(forcename,ii1) 
+
+#	file u 1:($3/(1+$3)) i 0 w l lt 22 title "{/Symbol z}=z/(1+z)", \
+
+unset output
+
