@@ -1,9 +1,0 @@
-# 1S0 GAP DATA FOR SRC N3LO
-# kf [fm-1]   gap0 [MeV]  Tc [MeV]	delta Tc
-0.666	        2.20 	      0.90		  0.10 # no_interpolation data, uncertainty in Tc from no int and relwidth0.2
-0.763         2.14        0.95      0.05 # gap T=0 is upper limit for 0.1
-0.840	        2.28 	      0.95		  0.05 # all relwidths agree
-0.961         2.17        0.90      0.10 # all relwidths agree - tc 0.9 does not converge
-1.058	        1.70	      0.75		  0.05 # relwidths02 and no interp show gap(0.1)=1.8-1.75 > gap(0)=1.7 agree - tc 0.9 does not converge
-1.211         0.97        0.30      0.10 # uncertainty in closure from different gaps
-1.333	        0.334	      0.10		  0.10
