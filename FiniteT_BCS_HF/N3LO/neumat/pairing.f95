@@ -4,7 +4,7 @@
         REAL(long), ALLOCATABLE, DIMENSION(:) :: gap,gap0,auxgap,newgap,xkaux,spaux,dgap2,xid
         REAL(long), ALLOCATABLE, DIMENSION(:,:) :: vnngap
         LOGICAL :: coupled
-        
+
         CONTAINS
 
           SUBROUTINE P_GAP
@@ -41,8 +41,8 @@
                do 998 ic=1,3
                   call AVFACNAME(iz1,iz2,ij,ic,pwname,coupled)
 
-! ... IF UNPHYSICAL CHANNEL OR INPUT PWs IS NOT                  
-                  if( ss == 2 .or. index(p_waves,trim(pwname)) .eq. 0 ) CYCLE                  
+! ... IF UNPHYSICAL CHANNEL OR INPUT PWs IS NOT
+                  if( ss == 2 .or. index(p_waves,trim(pwname)) .eq. 0 ) CYCLE
 
                   write(*,*) ij,pwname,ss,coupled
 
@@ -60,13 +60,13 @@
 ! ... ALLOCATE ALL ARRAYS
                   if(ALLOCATED(gap0)) DEALLOCATE( gap0 )
                   if(.not.ALLOCATED(gap0)) ALLOCATE( gap0(Nkmesh) )
-                  
+
                   if(ALLOCATED(gap)) DEALLOCATE(gap)
                   if(.not.ALLOCATED(gap)) ALLOCATE(gap(Nkaux))
 
                   if(ALLOCATED(xid)) DEALLOCATE(xid)
                   if(.not.ALLOCATED(xid)) ALLOCATE(xid(Nkaux))
-                  
+
                   if(ALLOCATED(auxgap)) DEALLOCATE( auxgap )
                   if(.not.ALLOCATED(auxgap)) ALLOCATE( auxgap(Nkaux) )
 
@@ -81,10 +81,10 @@
 
                   if(ALLOCATED(dgap2)) DEALLOCATE(dgap2)
                   if(.not.ALLOCATED(dgap2)) ALLOCATE( dgap2(Nkaux) )
-                  
+
                   if(ALLOCATED(vnngap)) DEALLOCATE(vnngap)
                   if(.not.ALLOCATED(vnngap)) ALLOCATE( vnngap(Nkaux,Nkaux) )
-! ... DONE ALLOCATING ALL ARRAYS                  
+! ... DONE ALLOCATING ALL ARRAYS
 
                   ! ... Diagonal channels only
                   gap=0_long
@@ -107,10 +107,10 @@
                      vpp=bx(1)
                      sgn=1_long
                      if(vpp<0) sgn=-1_long
-!                     gap0(ikmesh)=vpp !-sgn*abs(vpp) 
+!                     gap0(ikmesh)=vpp !-sgn*abs(vpp)
                      gap0(ikmesh)=-test*sgn*sqrt(abs(vpp/vpf))
                   enddo
-! ... DANGEROUS TO TAKE gap=gap0, DYNAMICAL RESIZING OCCURS                  
+! ... DANGEROUS TO TAKE gap=gap0, DYNAMICAL RESIZING OCCURS
                   gap(1:Nkmesh)=gap0
 
                   IF( coupled ) THEN
@@ -119,11 +119,11 @@
                         ! ... MINUS SIGN ACCORDING TO DEAN AND HJORTH-JENSEN
                         vnngap(ikmesh,Nkmesh+jkmesh) = -vNN(ikmesh,jkmesh,ij,i2)*wkmesh(jkmesh)*xkmesh(jkmesh)**2
                         vnngap(Nkmesh+ikmesh,jkmesh) = -vNN(ikmesh,jkmesh,ij,i3)*wkmesh(jkmesh)*xkmesh(jkmesh)**2
-                        vnngap(Nkmesh+ikmesh,Nkmesh+jkmesh) = vNN(ikmesh,jkmesh,ij,i4)*wkmesh(jkmesh)*xkmesh(jkmesh)**2  
+                        vnngap(Nkmesh+ikmesh,Nkmesh+jkmesh) = vNN(ikmesh,jkmesh,ij,i4)*wkmesh(jkmesh)*xkmesh(jkmesh)**2
                      END FORALL
                      xkaux(Nkmesh+1:Nkaux)=xkmesh
                      spaux(Nkmesh+1:Nkaux)=spe
-                     
+
                      call LIN_INT2D(xkmesh,xkmesh,vNN(:,:,ij,i4),ax,ax,bx)
                      vpf=bx(1)
                      test=xkfermi/2_long*sqrt(abs(vpf))
@@ -164,14 +164,14 @@
                      endif
 
                      spaux(1:Nkmesh)=spe
-                     if(coupled) spaux(Nkmesh+1:Nkaux)=spe                   
+                     if(coupled) spaux(Nkmesh+1:Nkaux)=spe
 
-                     xid=sqrt( ( spaux-xmu )**2 + dgap2 )
-                     auxgap=gap/2._long/xid*ttanh( t,xid ) 
-                     
+                     xid=sqrt( ( spaux-xmu )**2 + dgap2  )
+                     auxgap=gap/2._long/xid*ttanh( t,xid )
+
                      ! ... CUTOFF AT VERY LARGE K
                      WHERE(xkaux > cutoff) auxgap=auxgap*exp(-xkaux/cutoff)
-                     
+
                      newgap=-MATMUL(vnngap,auxgap)
 
                      if( maxval( abs(newgap-gap) ) < acc) EXIT
@@ -196,7 +196,7 @@
                         write(*,*) 'INF IN DGAP'
                         stop
                      endif
-                     
+
                      if( maxval( abs(dgap) ) < acc) EXIT
 
 !                     if(mod(iter,100) == 0) then
@@ -207,11 +207,11 @@
 !                        enddo
 !                        write(188,'(/,/)')
 !                     endif
-                        
+
                   enddo ! ITERATION LOOP
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                   writegap=.true.
-                  
+
                   if( maxval( abs(newgap-gap) ) > acc .or. iter==maxiter) then
                      write(*,'(a,1x,2i2,1x,a)') 'bad gap',iz1,iz2,pwname
                      writegap=.false.
@@ -219,31 +219,31 @@
 !                     RETURN
                   endif
 
-                  if( maxval( abs(gap) ) < acc ) then 
+                  if( maxval( abs(gap) ) < acc ) then
                      write(*,*) 'zero gap ',iz1,iz2,pwname
                      dgap=0_long
                   endif
 
                   if(writegap) call WRITE_GAP_OUT(ij,ic,iter)
-                  
+
                   if( ALLOCATED(gap) ) DEALLOCATE(gap)
                   if( ALLOCATED(xid) ) DEALLOCATE(xid)
                   if( ALLOCATED(gap0) ) DEALLOCATE(gap0)
                   if( ALLOCATED(auxgap) ) DEALLOCATE(auxgap)
                   if( ALLOCATED(newgap) ) DEALLOCATE(newgap)
                   if( ALLOCATED(xkaux) ) DEALLOCATE(xkaux)
-                  if( ALLOCATED(dgap2) ) DEALLOCATE(dgap2)                  
+                  if( ALLOCATED(dgap2) ) DEALLOCATE(dgap2)
                   if( ALLOCATED(vnngap) ) DEALLOCATE(vnngap)
 
 998            enddo  ! BOXES LOOP
 
 999         enddo ! PW LOOP
-            
+
           END SUBROUTINE P_GAP
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!          
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! ... SUBROUTINE TO WRITE OUT GAP INFO
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!          
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           SUBROUTINE WRITE_GAP_OUT(ij,ic,iter)
             USE precision_definition
             USE thermodynamical, ONLY : xkfermi,rho,t
@@ -256,7 +256,7 @@
 
             INTEGER(ilong), INTENT(IN) :: ij,ic,iter
             REAL (long), ALLOCATABLE, DIMENSION(:) :: gkout
-            
+
             INTEGER(ilong) :: ik
             REAL (long), DIMENSION(1) :: ax,bx
             REAL (long) :: gkf
@@ -274,15 +274,15 @@
                  rho,xkfermi,t,gkf,iter
 
 96          format(10es16.6)
-            
+
             write(un1,96) rho,t,xkfermi,gkf
 
             do ik=1,Nkmesh
-               if( .not. coupled ) then 
-                  write(un2,96) &                     
+               if( .not. coupled ) then
+                  write(un2,96) &
                        rho,t,xkfermi,xk(ik),dgap(ik),xid(ik),sigma_hf(ik),xme(ik),gap(ik)
                else
-                  write(un2,96) &                     
+                  write(un2,96) &
                        rho,t,xkfermi,xk(ik),dgap(ik),xid(ik),sigma_hf(ik),xme(ik),gap(ik),gap(ik+Nkmesh)
                endif
             enddo
@@ -290,14 +290,14 @@
 101         format(/,/)
             write(un2,101)
             ALLOCATE( gkout(Nkout) )
-            
+
             call LIN_INT(xkmesh,dgap,xkout,gkout)
             do ik=1,Nkout
-               write(un3,96) &                     
+               write(un3,96) &
                           rho,t,xkfermi,xkout(ik),gkout(ik)
             enddo
             write(un3,*)
-            
+
           END SUBROUTINE WRITE_GAP_OUT
-          
+
      END MODULE PAIRING

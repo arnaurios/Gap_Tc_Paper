@@ -1,4 +1,4 @@
- # coding: utf-8
+# coding: utf-8
 # manage data and fit
 #import pandas as pd
 import numpy as np
@@ -27,7 +27,6 @@ plt.rcParams.update(params)
 
 
 numcols=range(2)
-#fig, axs = plt.subplots(figsize=(3,3*(len(numcols))), nrows=len(numcols), ncols=1, sharex=True)
 fig, axs = plt.subplots(figsize=(7,4), nrows=1, ncols=2, sharey=True)
 
 # CHOOSE BETWEEN TWO METHODS TO GENERATE TWO DIFFERENT PLOTS
@@ -63,18 +62,6 @@ for ix,potential in enumerate(pots) :
 
     axs[0].set_title(r"BCS+HF, $\rho=$" + rho + " fm$^{-3}$")
 
-    #axs[0].fill_between(kf,gap-error_gap,gap+error_gap,linewidth=0,color=colors[ix],alpha=0.3,zorder=3)
-    #axs[0].errorbar(kf,gap,error_gap,linewidth=0,elinewidth=1.5,color=colors[ix],zorder=3)
-
-    #fname_fit_gap="../fits/fit_gap_" + potential + "_" + meth + ".dat"
-    #f_kf, f_gap = np.loadtxt(fname_fit_gap,usecols=(0,1),unpack=True)
-    #axs[0].plot(f_kf,f_gap,"-",color=colors[ix],zorder=2)
-
-    #fname_fit_gap2="../fits/fit2_gap_" + potential + "_" + meth + ".dat"
-    #if(os.path.exists(fname_fit_gap2)) :
-    #    f2_kf, f2_gap = np.loadtxt(fname_fit_gap2,usecols=(0,1),unpack=True)
-    #    axs[0].plot(f2_kf,f2_gap,"--",color=colors[ix],zorder=2)
-
     filename=dir1_SRC + potential + dir2_SRC + file
     print(filename)
     kkf, temp, gap = np.loadtxt(filename,usecols=(0,1,2),unpack=True)
@@ -100,7 +87,6 @@ for ix in numcols :
     ttt=np.arange(0.,1.3,0.2)
     axs[ix].set_xticks(ttt)
 
-#plt.tight_layout(pad=0.1)
 plt.tight_layout()
 fileout='gap_temperature.pdf'
 fig.savefig(fileout)

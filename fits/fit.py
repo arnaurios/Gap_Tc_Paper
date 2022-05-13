@@ -24,8 +24,8 @@ from scipy.stats import t
 method="SRC";
 #method="BCS_HF"
 #method="BCS"
-#potential="N3LO";
-potential="N3LO500_TBF_regfull";
+potential="N3LO";
+#potential="N3LO500_TBF_regfull";
 #potential="CDBONN"
 file="../FiniteT_" + method + "/" + potential + "/neumat/gaps/gap_tc_data.dat"
 
